@@ -2,6 +2,7 @@ from aiogram import Bot, Dispatcher, types, F, Router
 from aiogram.filters import Command, CommandStart
 from aiogram.fsm.context import FSMContext
 from app.keyboards import get_number, registration, help_categories
+from aiogram.enums import ParseMode
 from main_info.token import passwd
 from .states import Client
 from datetime import datetime
@@ -123,6 +124,12 @@ async def get_id(message: types.Message, state: FSMContext):
         blowfish_id = res_response_blowfish["data"][0]['id']
         external_id = res_response_external["data"][0]['id']
         source_amount_value = res_response_blowfish["data"][0]['source_amount_value']
+        parts = source_amount_value.split('.')
+        integer_part = parts[0]
+        decimal_part = parts[1]
+        formatted_integer_part = ' '.join(
+            [integer_part[max(i-3, 0):i] for i in range(len(integer_part), 0, -3)][::-1])
+        source_amount_value = f"{formatted_integer_part}.{decimal_part}"
         source_amount_currency = res_response_blowfish["data"][0]['source_amount_currency']
         date_create = res_response_blowfish["data"][0]['created_at']
         date_obj = date_obj = datetime.strptime(
@@ -133,18 +140,18 @@ async def get_id(message: types.Message, state: FSMContext):
         bank_name = res_response_blowfish["data"][0]['source_requisites'][0]['bank_name']
         card_holder = res_response_blowfish["data"][0]['source_requisites'][0]['card_holder']
         card_number = res_response_blowfish["data"][0]['source_requisites'][0]['card_number']
-
-        await message.reply(f"Deposit 📥 Transaction 🔥Processing\n\n"
-                            f"Blowfish ID: {blowfish_id}\n"
-                            f"External ID: {external_id}\n\n"
-                            f"Amount: 5 000 RUB\n"
-                            f"Date: {created_at_date}\n"
-                            f"Time (MSK): {created_at_time}\n\n"
-                            f"💹Provider: {provider}\n\n"
-                            f"💱Trader:\n"
-                            f"bank_name: {bank_name}\n"
-                            f"card_holder: {card_holder}\n"
-                            f"card_number: {card_number}")
+        result_text = f"Deposit 📥 Transaction 🔥Processing\n\n" + \
+            f"Blowfish ID: <code>{blowfish_id}</code>\n" + \
+            f"External ID: <code>{external_id}</code>\n\n" + \
+            f"Amount: <u>{source_amount_value} {source_amount_currency}</u>\n" + \
+            f"Date: <u>{created_at_date}</u>\n" + \
+            f"Time (MSK): <u>{created_at_time}</u>\n\n" + \
+            f"💱Provider: <u>{provider}</u>\n\n" + \
+            f"👨‍💼Trader:\n" + \
+            f"bank name: <u>{bank_name}</u>\n" + \
+            f"card holder: <u>{card_holder}</u>\n" + \
+            f"card number: <u>{card_number}</u>"
+        await message.reply(result_text, parse_mode=ParseMode.HTML)
         await message.answer('Введите id транзакции:')
         await state.set_state(Client.transaction_id)
 
