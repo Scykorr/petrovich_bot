@@ -4,25 +4,45 @@ from aiogram.fsm.context import FSMContext
 from app.keyboards import get_number, registration, help_categories
 from main_info.token import passwd
 from .states import Client
+from datetime import datetime
 
 router = Router()
 user_pass = passwd
+allowed_users = ['scykor', 'mm_operator_1', 'mm_operator_2', 'mm_operator_3',
+                 'mm_operator_4', 'mm_operator_5', 'mm_operator_6',
+                 'mm_operator_7', 'mm_operator_8', 'MM_operator_9',
+                 'mm_operator_10', 'mm_operator_11', 'mm_operator_12',
+                 'mm_operator_13', 'mm_operator_14', 'mm_operator_15',
+                 'MM_Support_16', 'MM_Support8', 'mm_support18',
+                 'mm_operator_19', 'mm_operator_20', 'MM_Support_21']
+
 
 @router.message(CommandStart())
 async def get_message(message: types.Message, state: FSMContext):
-    await message.reply('👋 Здравствуйте! Я Ваш бот-помощник!\n'
-                         'Для дальнейшей работу требуется пройти авторизацию.\n'
-                        'Введите пароль.')
-    await state.set_state(Client.waiting_for_password)
-
-@router.message(Client.waiting_for_password)
-async def check_password(message: types.Message, state: FSMContext):
-    if message.text == user_pass:
-        await message.reply("Вы успешно авторизованы!\n"
+    username = message.from_user.username
+    if username in allowed_users:
+        await message.reply("👋 Здравствуйте!\n"
+                            "Вы успешно авторизованы!\n"
                             "Введите id транзакции:")
         await state.set_state(Client.transaction_id)
     else:
-        await message.reply("Неверный пароль. Попробуйте еще раз.")
+        await message.reply("👋 Здравствуйте!\n"
+                            "Авторизация не пройдена!\n"
+                            "Для получения доступа к боту обратитесь к администратору!\n")
+    # await message.reply(f'{username}👋 Здравствуйте! Я Ваш бот-помощник!\n'
+    #                     'Для дальнейшей работу требуется пройти авторизацию.\n'
+    #                     'Введите пароль.')
+    # await state.set_state(Client.waiting_for_password)
+
+
+# @router.message(Client.waiting_for_password)
+# async def check_password(message: types.Message, state: FSMContext):
+#     if message.text == user_pass:
+#         await message.reply("Вы успешно авторизованы!\n"
+#                             "Введите id транзакции:")
+#         await state.set_state(Client.transaction_id)
+#     else:
+#         await message.reply("Неверный пароль. Попробуйте еще раз.")
 
 
 @router.message(Client.transaction_id)
@@ -32,23 +52,105 @@ async def get_id(message: types.Message, state: FSMContext):
         await state.clear()
     else:
         id_for_api = message.text
+        res_response_blowfish = {
+            "data": [
+                {
+                    "id": "20daad40-cba4-4687-a287-85e0e975dee5",
+                    "created_at": "2025-02-11 01:14:23",
+                    "updated_at": "2025-02-11 01:14:24",
+                    "type_id": 1,
+                    "type_text": "deposit",
+                    "state_id": 1,
+                    "state_text": "Created",
+                    "state_final": False,
+                    "participant_id": "404ae456-fb1d-4043-9e7b-a399f4d29cf3",
+                    "participant_name": "TestAurisAccount",
+                    "customer_id": "id-784693968623",
+                    "customer_payment_id": "449bc546-e589-4aca-83fd-879694134546",
+                    "source_amount_currency": "AZN",
+                    "source_amount_value": "6000.00",
+                    "destination_amount_currency": "AZN",
+                    "destination_amount_value": "0",
+                    "rate": "0",
+                    "rate_source_currency": "AZN",
+                    "rate_destination_currency": "AZN",
+                    "provider": "pay4u",
+                    "source_requisites": [
+                        {
+                            "bank_name": "sberbank",
+                            "card_holder": "Сбер Картович",
+                            "card_number": "1112121111111112"
+                        }
+                    ]
+                }
+            ],
+            "success": True
+        }
+        res_response_external = {
+            "data": [
+                {
+                    "id": "20daad40-cba4-4687-a287-85e0e975dee5",
+                    "created_at": "2025-02-11 01:14:23",
+                    "updated_at": "2025-02-11 01:14:24",
+                    "type_id": 1,
+                    "type_text": "deposit",
+                    "state_id": 1,
+                    "state_text": "Created",
+                    "state_final": False,
+                    "participant_id": "404ae456-fb1d-4043-9e7b-a399f4d29cf3",
+                    "participant_name": "TestAurisAccount",
+                    "customer_id": "id-784693968623",
+                    "customer_payment_id": "449bc546-e589-4aca-83fd-879694134546",
+                    "source_amount_currency": "AZN",
+                    "source_amount_value": "6000.00",
+                    "destination_amount_currency": "AZN",
+                    "destination_amount_value": "0",
+                    "rate": "0",
+                    "rate_source_currency": "AZN",
+                    "rate_destination_currency": "AZN",
+                    "provider": "pay4u",
+                    "source_requisites": [
+                        {
+                            "bank_name": "sberbank",
+                            "card_holder": "Сбер Картович",
+                            "card_number": "1112121111111112"
+                        }
+                    ]
+                }
+            ],
+            "success": True
+        }
+        blowfish_id = res_response_blowfish["data"][0]['id']
+        external_id = res_response_external["data"][0]['id']
+        source_amount_value = res_response_blowfish["data"][0]['source_amount_value']
+        source_amount_currency = res_response_blowfish["data"][0]['source_amount_currency']
+        date_create = res_response_blowfish["data"][0]['created_at']
+        date_obj = date_obj = datetime.strptime(
+            date_create, "%Y-%m-%d %H:%M:%S")
+        created_at_date = date_obj.strftime("%d.%m.%Y")
+        created_at_time = date_obj.strftime("%H:%M:%S")
+        provider = res_response_blowfish["data"][0]['provider']
+        bank_name = res_response_blowfish["data"][0]['source_requisites'][0]['bank_name']
+        card_holder = res_response_blowfish["data"][0]['source_requisites'][0]['card_holder']
+        card_number = res_response_blowfish["data"][0]['source_requisites'][0]['card_number']
+
         await message.reply(f"Deposit 📥 Transaction 🔥Processing\n\n"
-                            f"Blowfish ID: 85a6979e-cf86-4777-9b7e-37f4748e3edb\n"
-                            f"External ID: 456b6c26-192d-46ab-bab7-d47a12e28318\n\n"
+                            f"Blowfish ID: {blowfish_id}\n"
+                            f"External ID: {external_id}\n\n"
                             f"Amount: 5 000 RUB\n"
-                            f"Date: 10.02.2025\n"
-                            f"Time (MSK): 11:21:07\n\n"
-                            f"💹Provider: pay4u\n\n"
+                            f"Date: {created_at_date}\n"
+                            f"Time (MSK): {created_at_time}\n\n"
+                            f"💹Provider: {provider}\n\n"
                             f"💱Trader:\n"
-                            f"Name: Иван Сергеевич К.\n"
-                            f"Requisites: 1234 5678 0001 0000")
+                            f"bank_name: {bank_name}\n"
+                            f"card_holder: {card_holder}\n"
+                            f"card_number: {card_number}")
         await message.answer('Введите id транзакции:')
         await state.set_state(Client.transaction_id)
 
 #
 # @router.message(Client.exit_working)
 # async def exit_work(message: types.Message, state: FSMContext):
-
 
 
 # @router.message(F.text == 'Введите id транзакции:')
