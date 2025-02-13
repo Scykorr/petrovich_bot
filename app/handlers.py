@@ -1,8 +1,7 @@
-from aiogram import Bot, Dispatcher, types, F, Router
+from aiogram import types, Router
 from aiogram.filters import Command, CommandStart
 from aiogram.fsm.context import FSMContext
 from aiogram.enums import ParseMode
-from main_info.token import passwd
 from .states import Client
 from datetime import datetime, timedelta
 
@@ -16,6 +15,7 @@ allowed_users = ['scykor', 'mm_operator_1', 'mm_operator_2', 'mm_operator_3',
                  'mm_operator_13', 'mm_operator_14', 'mm_operator_15',
                  'MM_Support_16', 'MM_Support8', 'mm_support18',
                  'mm_operator_19', 'mm_operator_20', 'MM_Support_21']
+
 
 # Команда /start
 @router.message(CommandStart())
@@ -31,6 +31,7 @@ async def get_message(message: types.Message, state: FSMContext):
         await message.reply("👋 Здравствуйте!\n"
                             "Авторизация не пройдена!\n"
                             "Для получения доступа к боту обратитесь к администратору!\n")
+
 
 # Команда /help
 @router.message(Command("help"))

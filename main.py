@@ -6,6 +6,7 @@ from aiogram import Bot, Dispatcher
 from app.handlers import router
 from dotenv import load_dotenv
 
+
 async def main():
     logging.basicConfig(level=logging.INFO)
     load_dotenv()
@@ -21,4 +22,3 @@ if __name__ == '__main__':
         asyncio.run(main())
     except KeyboardInterrupt:
         print('Бот выключен')
-
