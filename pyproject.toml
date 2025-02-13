@@ -3,16 +3,30 @@ name = "petrovich-bot"
 version = "0.1.0"
 description = "simple tg bot"
 authors = [
-    {name = "'Tony",email = "fedosov-toxa@mail.ru"}
+    { name = "'Tony", email = "fedosov-toxa@mail.ru" }
 ]
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "aiogram (>=3.17.0,<4.0.0)",
-    "python-dotenv (>=1.0.1,<2.0.0)"
+    "python-dotenv (>=1.0.1,<2.0.0)",
+    "ruff (>=0.9.6,<0.10.0)"
 ]
 
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+
+[tool.ruff]
+line-length = 130
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "C", "UP", "I", "SIM", "N"]
+# Ignore 815 and 803 to avoid aliased for external APIs
+ignore = ["N815", "N803"]
+
+[tool.ruff.format]
+docstring-code-format = true
+docstring-code-line-length = 130

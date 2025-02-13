@@ -48,7 +48,7 @@ async def cmd_help(message: types.Message):
 
 # Команда /end
 @router.message(Command("end"))
-async def cmd_help(message: types.Message, state: FSMContext):
+async def end_command(message: types.Message, state: FSMContext):
     await message.answer('До свидания!👋')
     await state.clear()
 
@@ -145,17 +145,17 @@ async def get_id(message: types.Message, state: FSMContext):
         bank_name = res_response_blowfish["data"][0]['source_requisites'][0]['bank_name']
         card_holder = res_response_blowfish["data"][0]['source_requisites'][0]['card_holder']
         card_number = res_response_blowfish["data"][0]['source_requisites'][0]['card_number']
-        result_text = f"Deposit 📥 Transaction 🔥Processing\n\n" + \
-                      f"Blowfish ID: <code>{blowfish_id}</code>\n" + \
-                      f"External ID: <code>{external_id}</code>\n\n" + \
-                      f"Amount: <u>{source_amount_value} {source_amount_currency}</u>\n" + \
-                      f"Date: <u>{created_at_date}</u>\n" + \
-                      f"Time (MSK): <u>{created_at_time}</u>\n\n" + \
-                      f"💱Provider: <u>{provider}</u>\n\n" + \
-                      f"👨‍💼Trader:\n" + \
-                      f"bank name: <u>{bank_name}</u>\n" + \
-                      f"card holder: <u>{card_holder}</u>\n" + \
-                      f"card number: <u>{card_number}</u>"
+        result_text = "Deposit 📥 Transaction 🔥Processing\n\n" + \
+            f"Blowfish ID: <code>{blowfish_id}</code>\n" + \
+            f"External ID: <code>{external_id}</code>\n\n" + \
+            f"Amount: <u>{source_amount_value} {source_amount_currency}</u>\n" + \
+            f"Date: <u>{created_at_date}</u>\n" + \
+            f"Time (MSK): <u>{created_at_time}</u>\n\n" + \
+            f"💱Provider: <u>{provider}</u>\n\n" + \
+            "👨‍💼Trader:\n" + \
+            f"bank name: <u>{bank_name}</u>\n" + \
+            f"card holder: <u>{card_holder}</u>\n" + \
+            f"card number: <u>{card_number}</u>"
         await message.reply(result_text, parse_mode=ParseMode.HTML)
         await message.answer('Введите id транзакции:')
         await state.set_state(Client.transaction_id)
