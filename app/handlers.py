@@ -7,7 +7,8 @@ from .states import Client
 from datetime import datetime, timedelta
 
 router = Router()
-user_pass = passwd
+
+# список авторизованных пользователей
 allowed_users = ['scykor', 'mm_operator_1', 'mm_operator_2', 'mm_operator_3',
                  'mm_operator_4', 'mm_operator_5', 'mm_operator_6',
                  'mm_operator_7', 'mm_operator_8', 'MM_operator_9',
@@ -16,13 +17,14 @@ allowed_users = ['scykor', 'mm_operator_1', 'mm_operator_2', 'mm_operator_3',
                  'MM_Support_16', 'MM_Support8', 'mm_support18',
                  'mm_operator_19', 'mm_operator_20', 'MM_Support_21']
 
-
+# Команда /start
 @router.message(CommandStart())
 async def get_message(message: types.Message, state: FSMContext):
     username = message.from_user.username
     if username in allowed_users:
         await message.reply("👋 Здравствуйте!\n"
                             "Вы успешно авторизованы!\n"
+                            "/help - для получения списка команд\n"
                             "Введите id транзакции:")
         await state.set_state(Client.transaction_id)
     else:
@@ -30,13 +32,30 @@ async def get_message(message: types.Message, state: FSMContext):
                             "Авторизация не пройдена!\n"
                             "Для получения доступа к боту обратитесь к администратору!\n")
 
+# Команда /help
+@router.message(Command("help"))
+async def cmd_help(message: types.Message):
+    help_text = """
+📜 Список доступных команд:
 
+/start - Начать работу с ботом
+/help - Получить список команд
+/end - Закончить работу с ботом
+"""
+    await message.answer(help_text, parse_mode=ParseMode.HTML)
+
+
+# Команда /end
+@router.message(Command("end"))
+async def cmd_help(message: types.Message, state: FSMContext):
+    await message.answer('До свидания!👋')
+    await state.clear()
+
+
+# API-запрос + вывод информации
 @router.message(Client.transaction_id)
 async def get_id(message: types.Message, state: FSMContext):
-    if message.text == 'Выход':
-        await message.answer('До свидания!👋')
-        await state.clear()
-    else:
+    if message.text != '/help':
         id_for_api = message.text
         res_response_blowfish = {
             "data": [
